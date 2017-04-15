@@ -66,19 +66,18 @@ sub add_item {
     };
 
     if (defined $fn) {
-        $payload->{upload_option}    = 'upload_paths';
-        $payload->{filesystem_paths} = $fn;
+        $payload->{upload_option}    = 'upload_file';
+        #$payload->{filesystem_paths} = $fn;
         $payload->{file_type} = 'auto';
     }
     else {
         $payload->{name} = $name;
     }
 
-    print "PAY:\n";
-    print Dumper $payload;
     my $res = $self->{ua}->_post(
         "libraries/$self->{id}/contents",
         $payload,
+        $fn,
     );
 
     return undef if (! defined $res);

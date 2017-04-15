@@ -10,6 +10,7 @@ use HTTP::Tiny;
 use Carp;
 use JSON;
 use URI::Escape;
+use File::Basename qw/basename/;
 
 use API::Galaxy::Library;
 
@@ -92,36 +93,57 @@ sub libraries {
 
 sub _post {
 
-    my ($self, $path, $payload, @params) = @_;
+    my ($self, $path, $payload, $fn) = @_;
 
-    if (defined $self->{key}) {
-        push @params, ['key' => $self->{key}];
-    }
+    my $params = defined $self->{key} 
+        ? "?key=" . uri_escape($self->{key})
+        : '';
 
     my $url = $self->{url}
-        . "/$path";
-
-    if (@params) {
-        my @strings;
-        for (@params) {
-            my ($key, $val) = map {uri_escape($_)} @$_;
-            push @strings, "$key=$val";
-        }
-        my $param_string = join '&', @strings;
-        $url .= "?$param_string";
-    }
-    warn "URL: $url\n";     
-
-    $payload = encode_json($payload);
+        . "/$path$params";
 
     for (1.. $self->{retry}) {
 
-        my $res = $self->{ua}->post( $url => {
-            headers => {
-                'content-type' => 'application/json',
-            },
-            content => $payload,
-        } );
+        my $res;
+        if (defined $fn) {
+
+            my $boundary = 'xYzZY__xYzZY__sYzZY__xYzZY__xYzZY';
+
+            my $size = 0;
+            for (keys %$payload) {
+                $size += 49 + length($_) + length($payload->{$_}) +
+                    length($boundary);
+            }
+            $size += 62 + length('files_0|file_data') + (-s $fn) +
+                + length(basename($fn)) + length($boundary);
+            $size += 6 + length $boundary;
+
+            my $cb = _generator(
+                $boundary,
+                $payload,
+                $fn,
+            );
+
+            $res = $self->{ua}->post( $url => {
+                headers => {
+                    'content-type' => "multipart/form-data; boundary=$boundary",
+                    'content-length' => $size,
+                },
+                content => $cb,
+            } );
+
+        }
+        else {
+
+            $payload = encode_json($payload);
+            $res = $self->{ua}->post( $url => {
+                headers => {
+                    'content-type' => 'application/json',
+                },
+                content => $payload,
+            } );
+
+        }
 
         if (! $res->{success}) {
             warn "HTTP Error: $res->{status} ($res->{reason})\n$res->{content}\n";
@@ -180,6 +202,77 @@ sub _get {
     return undef;
 
 }
+
+sub _split_payload {
+
+    my ($payload, $base) = @_;
+
+    my $boundary = 'xYzZY__xYzZY__sYzZY__xYzZY__xYzZY';
+    my $CRLF = "\015\012";
+
+    my $chunk;
+
+    for my $k (keys %$payload) {
+
+        #47 + length key + length val + length boundary
+        $chunk .= "--$boundary$CRLF";
+        $chunk .= "Content-Disposition: form-data; name=\"$k\"$CRLF$CRLF";
+        $chunk .= "$payload->{$k}$CRLF";
+
+        #49 + length key + length val + length boundary
+        #13 + length filename
+        #6 + length boundary
+
+    }
+    $chunk .= "--$boundary$CRLF";
+    $chunk .= "Content-Disposition: form-data; name=\"files_0|file_data\"; filename=\"$base\"$CRLF$CRLF";
+
+    return $chunk;
+            
+}        
+
+sub _generator {
+
+    my ($boundary, $payload, $fn) = @_;
+
+    my $n_read = 4096;
+    my $done = 0;
+
+    open my $fh, '<', $fn or die "Error open: $!\n";
+    my $CRLF = "\015\012";
+    my @keys = keys %$payload;
+    my $base = basename($fn);
+
+    return sub {
+
+        return undef if ($done);
+
+        my $chunk;
+
+        while (scalar @keys) {
+            my $k = shift @keys; 
+            $chunk .= "--$boundary$CRLF";
+            $chunk .= "Content-Disposition: form-data; name=\"$k\"$CRLF$CRLF";
+            $chunk .= "$payload->{$k}$CRLF";
+            return $chunk if (scalar @keys);
+            $chunk .= "--$boundary$CRLF";
+            $chunk .= "Content-Disposition: form-data; name=\"files_0|file_data\"; filename=\"$base\"$CRLF$CRLF";
+            return $chunk;
+        }
+
+        while (read($fh, my $buf, $n_read)) {
+            return $buf;
+        }
+
+        $done = 1;
+        return "$CRLF--$boundary--$CRLF";
+
+    }
+            
+}        
+            
+
+
 
 
 __END__

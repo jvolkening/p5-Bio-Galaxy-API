@@ -44,7 +44,6 @@ if (defined $want) {
         }
         $leaf = $new_leaf;
     }
-    print Dumper $leaf;
     warn "adding file $file\n";
     my $f = $want->add_file($leaf->id() => $file, abs_path($new_file))
         or die "Error adding file\n";
