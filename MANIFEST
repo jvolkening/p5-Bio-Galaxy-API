@@ -1,0 +1,13 @@
+Build.PL
+Changes
+dev/brute.pl
+dev/interfaces
+dev/t.pl
+lib/API/Galaxy.pm
+MANIFEST			This list of files
+README
+t/00-load.t
+t/boilerplate.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t

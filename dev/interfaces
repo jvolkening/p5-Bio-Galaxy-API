@@ -1,0 +1,25 @@
+batch ?
+configuration
+datasets
+datatypes X
+folders
+forms
+ftp_files X
+genomes
+groups
+histories
+jobs
+libraries
+pages ?
+quotas
+requests ?
+roles
+samples
+tool_data X
+tool_shed_repositories X
+tools
+tours
+users
+version
+visualizations
+workflows X
