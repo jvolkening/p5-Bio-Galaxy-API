@@ -14,6 +14,7 @@ use File::Basename qw/basename/;
 
 use Bio::Galaxy::API::Library;
 use Bio::Galaxy::API::Workflow;
+use Bio::Galaxy::API::User;
 
 our $VERSION = '0.001';
 
@@ -104,6 +105,18 @@ sub workflows {
 
 }
 
+sub users {
+
+    my ($self, $user) = @_;
+
+    my $users = $self->_get('users', ['f_any' => $user])
+        // return undef;
+    return 
+        grep {! $_->deleted()}
+        map  {Bio::Galaxy::API::User->new($self, $_)} @{$users};
+
+}
+
 sub _post {
 
     my ($self, $path, $payload, $fn) = @_;
@@ -148,7 +161,7 @@ sub _post {
         }
         else {
             
-            my $encoded = encode_json($payload);
+            my $encoded = JSON->new->encode($payload);
             $res = $self->{ua}->post( $url => {
                 headers => {
                     'content-type' => 'application/json',
@@ -163,7 +176,7 @@ sub _post {
         }
 
         else {
-            return decode_json($res->{content});
+            return JSON->new->allow_nonref->decode( $res->{content} );
         }
 
     }
@@ -206,7 +219,7 @@ sub _get {
             warn "Error: server did not return JSON payload as expected\n";
         }
         else {
-            return decode_json($res->{content});
+            return JSON->new->allow_nonref->decode( $res->{content} );
         }
 
     }
