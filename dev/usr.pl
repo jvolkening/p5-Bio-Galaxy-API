@@ -11,11 +11,12 @@ my $ua = Bio::Galaxy::API->new(
     check_secure => 0,
 );
 
-my @users = $ua->users('foo@bar.net')
-    or die "no user found!\n";;
-print Dumper $_ for (@users);
+my @users = $ua->users($ARGV[0]);
+my $n = scalar(@users);
 
 #my $key = $users[0]->get_key();
 #print "KEY: $key\n";
-my $desc = $users[0]->description();
-print Dumper $desc;
+print Dumper $users[0];
+print "----------------------\n";
+$users[0]->update();
+print Dumper $users[0];

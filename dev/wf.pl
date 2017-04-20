@@ -15,6 +15,9 @@ my @wfs = $ua->workflows()
     or die "no workflows found!\n";;
 
 for my $wf (@wfs) {
+    print Dumper $wf;
+    print "-------------------------\n";
     print Dumper $wf->description();
+    print "=========================\n";
 }
 

@@ -4,19 +4,18 @@ use 5.012;
 use strict;
 use warnings FATAL => 'all';
 
-use Data::Dumper;
-use URI;
-use HTTP::Tiny;
 use Carp;
-use JSON;
-use URI::Escape;
 use File::Basename qw/basename/;
+use HTTP::Tiny;
+use JSON;
+use URI;
+use URI::Escape;
 
 use Bio::Galaxy::API::Library;
-use Bio::Galaxy::API::Workflow;
 use Bio::Galaxy::API::User;
+use Bio::Galaxy::API::Workflow;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 sub new {
 
@@ -47,7 +46,9 @@ sub new {
     $url->path('api') if (! length $url->path);
 
     $self->{url} = $url;
-    $self->{ua} = HTTP::Tiny->new( 'agent' => "Bio::Galaxy::API/$VERSION" );
+    $self->{ua} = HTTP::Tiny->new(
+        'agent' => "Bio::Galaxy::API/$VERSION",
+    );
 
     # check connectivity
     my $version = $self->version;
@@ -114,6 +115,18 @@ sub users {
     return 
         grep {! $_->deleted()}
         map  {Bio::Galaxy::API::User->new($self, $_)} @{$users};
+
+}
+
+sub api_key {
+
+    my ($self, $key) = @_;
+
+    my $old_key = $self->{key};
+    $self->{key} = $key
+        if (defined $key);
+
+    return $old_key;
 
 }
 
@@ -304,88 +317,106 @@ __END__
 
 =head1 NAME
 
-Bio::Galaxy::API - Interface to the Galaxy server API
+Bio::Galaxy::API - interface to the Galaxy server API
 
 
 =head1 SYNOPSIS
 
-Quick summary of what the module does.
-
-Perhaps a little code snippet.
-
     use Bio::Galaxy::API;
 
-    my $foo = Bio::Galaxy::API->new();
-    ...
+    my $ua = Bio::Galaxy::API->new(
+        url          => 'https://localhost:8080/api',
+        api_key      => $secret_token,
+        check_secure => 1,
+        retry        => 3,
+    );
 
-=head1 EXPORT
+=head1 DESCRIPTION
 
-A list of functions that can be exported.  You can delete this section
-if you don't export anything, such as for a purely object-oriented module.
+=head1 CONSTRUCTORS
 
-=head1 SUBROUTINES/METHODS
+=head2 new
 
-=head2 function1
+    my $ua = Bio::Galaxy::API->new(
+        url          => 'https://localhost:8080/api',
+        api_key      => $secret_token,
+        check_secure => 1,
+        retry        => 3,
+    );
 
-=cut
+Returns a new C<Bio::Galaxy::API> client object. Specifying a URL to the REST
+service is required; all other parameters are optional (although most use
+cases will require that you provide an API key, either during construction or
+later using the C<api_key> method). The following are accepted parameters:
 
-sub function1 {
-}
+=over 1
 
-=head2 function2
+=item * url - the full URL of the Galaxy REST service
 
-=cut
+=item * api_key - the API key of a valid user on the Galaxy server
 
-sub function2 {
-}
+=item * check_secure - if true, will check that the URL provided
+uses TLS/SSL encryption and fail otherwise. This is always a good idea if interacting with a
+remote server, but can be turned off if you know what you're doing (e.g. for
+testing or connecting over localhost on a secure machine). (Default: 1)
 
-=head1 AUTHOR
-
-Jeremy Volkening, C<< <jdv at base2bio.com> >>
-
-=head1 BUGS
-
-Please report any bugs or feature requests to C<bug-webservice-galaxy at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Bio-Galaxy-API>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
-
-
-
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc Bio::Galaxy::API
-
-
-You can also look for information at:
-
-=over 4
-
-=item * RT: CPAN's request tracker (report bugs here)
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Bio-Galaxy-API>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Bio-Galaxy-API>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Bio-Galaxy-API>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Bio-Galaxy-API/>
+=item * retry - the number of times the client will attempt a connection with
+the server before giving up. (Default: 3)
 
 =back
 
+=head1 METHODS
 
-=head1 ACKNOWLEDGEMENTS
+=head2 version
 
+    my $v = $ua->version;
 
-=head1 LICENSE AND COPYRIGHT
+Returns the version of the Galaxy server pointed to (NOT the version of this
+module).
+
+=head2 users
+
+    my @users = $ua->users;
+    my @users = $ua->users( $username );
+
+Returns an array of L<Bio::Galaxy::API::User> objects representing registered
+Galaxy users. Optionally takes a string containing a username or email
+address, in which case it will filter on that token.
+
+=head2 libraries
+
+    my @libs = $ua->libraries;
+
+Returns an array of L<Bio::Galaxy::API::Library> objects representing data
+libraries available to the current user.
+
+=head2 workflows
+
+    my @workflows = $ua->workflows;
+
+Returns an array of L<Bio::Galaxy::API::Workflow> objects representing
+workflows available to the current user.
+
+=head2 api_key
+
+    my $key = $ua->api_key;
+    my $key = $ua->api_key( $new_key );
+
+Gets/sets the API key associated with the current session. This key is passed
+along with each request in order to authenticate with the server and inform
+the server which user account to interact with. Returns the value of the key
+(or the previous value if a new key is specified).
+
+=head1 AUTHOR
+
+Jeremy Volkening, C<< <jdv@base2bio.com> >>
+
+=head1 CAVEATS AND BUGS
+
+Please report any bugs or feature requests to the issue tracker
+at L<https://github.com/jvolkening/p5-Bio-Galaxy-API>.
+
+=head1 COPYRIGHT AND LICENSE
 
 Copyright 2017 Jeremy Volkening.
 
@@ -402,7 +433,4 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see L<http://www.gnu.org/licenses/>.
 
-
 =cut
-
-1; # End of Bio::Galaxy::API
