@@ -49,4 +49,14 @@ sub get_key {
 
 }
 
+sub description {
+    
+    my ($self) = @_;
+
+    my $description = $self->{ua}->_get("users/$self->{id}");
+
+    return $description;
+
+}
+
 1;

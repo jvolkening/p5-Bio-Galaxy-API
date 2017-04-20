@@ -12,8 +12,10 @@ my $ua = Bio::Galaxy::API->new(
 );
 
 my @users = $ua->users('foo@bar.net')
-    or die "no libs found!\n";;
+    or die "no user found!\n";;
 print Dumper $_ for (@users);
 
-my $key = $users[0]->get_key();
-print "KEY: $key\n";
+#my $key = $users[0]->get_key();
+#print "KEY: $key\n";
+my $desc = $users[0]->description();
+print Dumper $desc;
