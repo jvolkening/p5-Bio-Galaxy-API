@@ -15,6 +15,14 @@ Bio::Galaxy::API - interface to the Galaxy server API
 
 # DESCRIPTION
 
+`Bio::Galaxy::API` is an interface to the REST API of the Galaxy informatics
+platform ([https://galaxyproject.org](https://galaxyproject.org)).
+
+WARNING: This library is currently in early development. The API (of this
+library, not of the Galaxy REST service) is not stable and will likely change.
+Most functions of the REST API remain unimplemented. This warning will be
+removed when the library reaches a more mature state.
+
 # CONSTRUCTORS
 
 ## new

@@ -7,7 +7,7 @@ lib/Bio/Galaxy/API/User.pm
 lib/Bio/Galaxy/API/Workflow.pm
 lib/Bio/Galaxy/API/Workflow/Invocation.pm
 MANIFEST			This list of files
-README
+README.md
 t/00-load.t
 t/boilerplate.t
 t/manifest.t
