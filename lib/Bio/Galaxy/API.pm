@@ -47,7 +47,7 @@ sub new {
     $url->path('api') if (! length $url->path);
 
     $self->{url} = $url;
-    $self->{ua} = HTTP::Tiny->new;
+    $self->{ua} = HTTP::Tiny->new( 'agent' => "Bio::Galaxy::API/$VERSION" );
 
     # check connectivity
     my $version = $self->version;
