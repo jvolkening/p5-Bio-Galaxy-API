@@ -1,0 +1,14 @@
+.*
+!/.gitignore
+!/.gitattributes
+!/.travis.yml
+/Build
+/Makefile.old
+/blib/
+/_build/
+/META.*
+/MYMETA.*
+/pm_to_blib
+*.tar.gz
+*.bak
+/Bio-Galaxy-API*
