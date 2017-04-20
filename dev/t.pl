@@ -1,12 +1,12 @@
 use strict;
 use warnings;
 
-use API::Galaxy;
+use Bio::Galaxy::API;
 use List::Util qw/first/;
 use Data::Dumper;
 use Cwd qw/abs_path/;
 
-my $ua = API::Galaxy->new(
+my $ua = Bio::Galaxy::API->new(
     url => 'http://localhost:8080',
     check_secure => 0,
 );

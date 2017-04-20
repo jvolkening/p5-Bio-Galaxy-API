@@ -1,4 +1,4 @@
-package API::Galaxy;
+package Bio::Galaxy::API;
 
 use 5.012;
 use strict;
@@ -12,7 +12,8 @@ use JSON;
 use URI::Escape;
 use File::Basename qw/basename/;
 
-use API::Galaxy::Library;
+use Bio::Galaxy::API::Library;
+use Bio::Galaxy::API::Workflow;
 
 our $VERSION = '0.001';
 
@@ -87,7 +88,19 @@ sub libraries {
         // return undef;
     return 
         grep {! $_->deleted()}
-        map  {API::Galaxy::Library->new($self, $_)} @{$libs};
+        map  {Bio::Galaxy::API::Library->new($self, $_)} @{$libs};
+
+}
+
+sub workflows {
+
+    my ($self) = @_;
+
+    my $wfs = $self->_get('workflows')
+        // return undef;
+    return 
+        grep {! $_->deleted()}
+        map  {Bio::Galaxy::API::Workflow->new($self, $_)} @{$wfs};
 
 }
 
@@ -134,13 +147,13 @@ sub _post {
 
         }
         else {
-
-            $payload = encode_json($payload);
+            
+            my $encoded = encode_json($payload);
             $res = $self->{ua}->post( $url => {
                 headers => {
                     'content-type' => 'application/json',
                 },
-                content => $payload,
+                content => $encoded,
             } );
 
         }
@@ -180,7 +193,6 @@ sub _get {
         my $param_string = join '&', @strings;
         $url .= "?$param_string";
     }
-    warn "URL: $url\n";     
 
     for (1.. $self->{retry}) {
 
@@ -279,7 +291,7 @@ __END__
 
 =head1 NAME
 
-API::Galaxy - Interface to the Galaxy server API
+Bio::Galaxy::API - Interface to the Galaxy server API
 
 
 =head1 SYNOPSIS
@@ -288,9 +300,9 @@ Quick summary of what the module does.
 
 Perhaps a little code snippet.
 
-    use API::Galaxy;
+    use Bio::Galaxy::API;
 
-    my $foo = API::Galaxy->new();
+    my $foo = Bio::Galaxy::API->new();
     ...
 
 =head1 EXPORT
@@ -321,7 +333,7 @@ Jeremy Volkening, C<< <jdv at base2bio.com> >>
 =head1 BUGS
 
 Please report any bugs or feature requests to C<bug-webservice-galaxy at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=API-Galaxy>.  I will be notified, and then you'll
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Bio-Galaxy-API>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
 
@@ -331,7 +343,7 @@ automatically be notified of progress on your bug as I make changes.
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc API::Galaxy
+    perldoc Bio::Galaxy::API
 
 
 You can also look for information at:
@@ -340,19 +352,19 @@ You can also look for information at:
 
 =item * RT: CPAN's request tracker (report bugs here)
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=API-Galaxy>
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Bio-Galaxy-API>
 
 =item * AnnoCPAN: Annotated CPAN documentation
 
-L<http://annocpan.org/dist/API-Galaxy>
+L<http://annocpan.org/dist/Bio-Galaxy-API>
 
 =item * CPAN Ratings
 
-L<http://cpanratings.perl.org/d/API-Galaxy>
+L<http://cpanratings.perl.org/d/Bio-Galaxy-API>
 
 =item * Search CPAN
 
-L<http://search.cpan.org/dist/API-Galaxy/>
+L<http://search.cpan.org/dist/Bio-Galaxy-API/>
 
 =back
 
@@ -380,4 +392,4 @@ along with this program.  If not, see L<http://www.gnu.org/licenses/>.
 
 =cut
 
-1; # End of API::Galaxy
+1; # End of Bio::Galaxy::API

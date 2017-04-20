@@ -1,4 +1,4 @@
-API-Galaxy
+Bio-Galaxy-API
 
 The README is used to introduce the module and provide instructions on
 how to install the module, any machine dependencies it may have (for
@@ -26,21 +26,21 @@ SUPPORT AND DOCUMENTATION
 After installing, you can find documentation for this module with the
 perldoc command.
 
-    perldoc API::Galaxy
+    perldoc Bio::Galaxy::API
 
 You can also look for information at:
 
     RT, CPAN's request tracker (report bugs here)
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=API-Galaxy
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Bio-Galaxy-API
 
     AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/API-Galaxy
+        http://annocpan.org/dist/Bio-Galaxy-API
 
     CPAN Ratings
-        http://cpanratings.perl.org/d/API-Galaxy
+        http://cpanratings.perl.org/d/Bio-Galaxy-API
 
     Search CPAN
-        http://search.cpan.org/dist/API-Galaxy/
+        http://search.cpan.org/dist/Bio-Galaxy-API/
 
 
 LICENSE AND COPYRIGHT

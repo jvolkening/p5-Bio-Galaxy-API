@@ -1,9 +1,10 @@
 Build.PL
 Changes
-dev/brute.pl
-dev/interfaces
-dev/t.pl
-lib/API/Galaxy.pm
+lib/Bio/Galaxy/API.pm
+lib/Bio/Galaxy/API/Library.pm
+lib/Bio/Galaxy/API/Library/Item.pm
+lib/Bio/Galaxy/API/Workflow.pm
+lib/Bio/Galaxy/API/Workflow/Invocation.pm
 MANIFEST			This list of files
 README
 t/00-load.t

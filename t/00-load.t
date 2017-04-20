@@ -7,7 +7,7 @@ use Test::More;
 plan tests => 1;
 
 BEGIN {
-    use_ok( 'API::Galaxy' ) || print "Bail out!\n";
+    use_ok( 'Bio::Galaxy::API' ) || print "Bail out!\n";
 }
 
-diag( "Testing API::Galaxy $API::Galaxy::VERSION, Perl $], $^X" );
+diag( "Testing Bio::Galaxy::API $Bio::Galaxy::API::VERSION, Perl $], $^X" );

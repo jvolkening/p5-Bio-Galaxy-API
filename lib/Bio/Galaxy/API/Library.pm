@@ -1,4 +1,4 @@
-package API::Galaxy::Library;
+package Bio::Galaxy::API::Library;
 
 use 5.012;
 use strict;
@@ -6,7 +6,7 @@ use warnings FATAL => 'all';
 use Carp;
 use Data::Dumper;
 
-use API::Galaxy::Library::Item;
+use Bio::Galaxy::API::Library::Item;
 
 #'synopsis' => 'This is the personal data library for Baz Bar',
 #'id' => 'ebfb8f50c6abde6d',
@@ -52,7 +52,7 @@ sub contents {
 
     return
         grep {! $_->deleted()}
-        map  {API::Galaxy::Library::Item->new($self->{ua}, $_)} @{$contents};
+        map  {Bio::Galaxy::API::Library::Item->new($self->{ua}, $_)} @{$contents};
 
 }
 
@@ -85,7 +85,7 @@ sub add_item {
 
     $res->{type} = $type;
 
-    return API::Galaxy::Library::Item->new($self->{ua}, $res);
+    return Bio::Galaxy::API::Library::Item->new($self->{ua}, $res);
 
 }
 
