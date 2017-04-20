@@ -121,12 +121,9 @@ sub _post {
 
     my ($self, $path, $payload, $fn) = @_;
 
-    my $params = defined $self->{key} 
-        ? "?key=" . uri_escape($self->{key})
-        : '';
-
-    my $url = $self->{url}
-        . "/$path$params";
+    my $url = join '/',
+        $self->{url},
+        $path;
 
     for (1.. $self->{retry}) {
 
@@ -152,8 +149,9 @@ sub _post {
 
             $res = $self->{ua}->post( $url => {
                 headers => {
-                    'content-type' => "multipart/form-data; boundary=$boundary",
+                    'content-type'   => "multipart/form-data; boundary=$boundary",
                     'content-length' => $size,
+                    'x-api-key'      => $self->{key},
                 },
                 content => $cb,
             } );
@@ -165,6 +163,7 @@ sub _post {
             $res = $self->{ua}->post( $url => {
                 headers => {
                     'content-type' => 'application/json',
+                    'x-api-key'    => $self->{key},
                 },
                 content => $encoded,
             } );
@@ -190,12 +189,9 @@ sub _get {
 
     my ($self, $path, @params) = @_;
 
-    if (defined $self->{key}) {
-        push @params, ['key' => $self->{key}];
-    }
-
-    my $url = $self->{url}
-        . "/$path";
+    my $url = join '/',
+        $self->{url},
+        $path;
 
     if (@params) {
         my @strings;
@@ -209,7 +205,11 @@ sub _get {
 
     for (1.. $self->{retry}) {
 
-        my $res = $self->{ua}->get($url);
+        my $res = $self->{ua}->get($url => {
+            headers => {
+                'x-api-key' => $self->{key},
+            },
+        } );
 
         if (! $res->{success}) {
             warn "HTTP Error: $res->{status} ($res->{reason})\n";
