@@ -4,7 +4,6 @@ use 5.012;
 use strict;
 use warnings FATAL => 'all';
 use Carp;
-use Data::Dumper;
 
 use Bio::Galaxy::API::Library::Item;
 
