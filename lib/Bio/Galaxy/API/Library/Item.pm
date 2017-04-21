@@ -9,16 +9,19 @@ our $VERSION = '0.001';
 
 sub new {
 
-    my ($class, $ua, $props) = @_;
+    my ($class, $lib, $ua, $props) = @_;
 
-    $props->{ua} = $ua;
+    $props->{ua}      = $ua;
+    $props->{library} = $lib;
 
-    for my $required (qw/ua name id/) {
+    for my $required (qw/ua library name id/) {
         croak "Required parameter $required missing"
             if (! defined $props->{$required});
     }
 
     my $self =  bless $props => $class;
+
+    $self->update;
 
     return $self;
 
@@ -27,6 +30,22 @@ sub new {
 sub id      {return $_[0]->{id}     }
 sub name    {return $_[0]->{name}   }
 sub deleted {return $_[0]->{deleted}}
+
+sub update {
+    
+    my ($self) = @_;
+
+    my $ref = $self->{ua}->_get(
+        "libraries/$self->{library}/contents/$self->{id}",
+    );
+
+    for (keys %{$ref}) {
+        $self->{$_} = $ref->{$_};
+    }
+
+    return;
+
+}
 
 1;
 
@@ -87,6 +106,16 @@ necessarily unique).
 
 Returns a boolean value indicating whether the library item has been marked as
 deleted on the system.
+
+=head2 update
+
+    $item->update();
+
+Queries the server and performs an in-place update of the item metadata
+stored in the object. This is called once upon object creation and generally
+will not need to be called again, except possibly in the course of long-running
+processes (daemons, etc).
+
 
 =head1 AUTHOR
 

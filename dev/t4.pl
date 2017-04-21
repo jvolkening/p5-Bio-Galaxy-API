@@ -23,10 +23,9 @@ my @libs = $ua->libraries()
 my $want = first {$_->name() eq $lib} @libs;
 die "no lib found\n" if (! defined $want);
 
-my $new = $want->add_file(
-    path => $new_file,
-    file => $new_file,
-    parent => $ARGV[0],
+my $new = $want->add_folder(
+    path => $ARGV[0],
+    parent => $ARGV[1],
 );
 
 if ($new) {

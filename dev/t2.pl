@@ -11,22 +11,11 @@ my $ua = Bio::Galaxy::API->new(
 );
 
 my $lib = 'foo@bar.net';
-my $new_file = 'user/project_01/test.fa';
-die "regular file not found\n"
-    if (! -f $new_file);
-$new_file = "/$new_file"
-    if ($new_file !~ /^\//);
-
-
-my @dirs = split /\//, $new_file;
-my $file = pop @dirs;
-
 
 my @libs = $ua->libraries()
     or die "no libs found!\n";;
 my $want = first {$_->name() eq $lib} @libs;
 my $id = $want->id();
-warn "ID: $id\n";
 
 if (defined $want) {
     my @contents = $want->contents();

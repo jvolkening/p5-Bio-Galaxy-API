@@ -14,9 +14,5 @@ my $ua = Bio::Galaxy::API->new(
 my @users = $ua->users($ARGV[0]);
 my $n = scalar(@users);
 
-#my $key = $users[0]->get_key();
-#print "KEY: $key\n";
-print Dumper $users[0];
-print "----------------------\n";
-$users[0]->update();
-print Dumper $users[0];
+my $key = $users[0]->key();
+print "$key\n";;
