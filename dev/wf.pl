@@ -16,8 +16,6 @@ my @wfs = $ua->workflows()
 
 for my $wf (@wfs) {
     print Dumper $wf;
-    print "-------------------------\n";
-    print Dumper $wf->description();
     print "=========================\n";
 }
 

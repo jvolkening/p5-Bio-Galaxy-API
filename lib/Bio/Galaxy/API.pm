@@ -164,16 +164,19 @@ sub _post {
 
             my $boundary = 'xYzZY__xYzZY__sYzZY__xYzZY__xYzZY';
 
+            my $base = $payload->{name} // basename($fn);
+
             my $size = 0;
             for (keys %$payload) {
                 $size += 49 + length($_) + length($payload->{$_}) +
                     length($boundary);
             }
             $size += 62 + length('files_0|file_data') + (-s $fn) +
-                + length(basename($fn)) + length($boundary);
+                + length($base) + length($boundary);
             $size += 6 + length $boundary;
 
             my $cb = _generator(
+                $base,
                 $boundary,
                 $payload,
                 $fn,
@@ -290,7 +293,7 @@ sub _split_payload {
 
 sub _generator {
 
-    my ($boundary, $payload, $fn) = @_;
+    my ($base, $boundary, $payload, $fn) = @_;
 
     my $n_read = 4096;
     my $done = 0;
@@ -298,7 +301,6 @@ sub _generator {
     open my $fh, '<', $fn or die "Error open: $!\n";
     my $CRLF = "\015\012";
     my @keys = keys %$payload;
-    my $base = basename($fn);
 
     return sub {
 
