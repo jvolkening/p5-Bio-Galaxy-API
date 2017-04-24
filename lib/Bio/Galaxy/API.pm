@@ -424,6 +424,29 @@ libraries available to the current user.
 Returns an array of L<Bio::Galaxy::API::Workflow> objects representing
 workflows available to the current user.
 
+=head2 new_user
+
+    my $user = $ua->new_user(
+        user     => $username,
+        email    => $email,
+        password => $pw,
+    );
+
+Attempts to create a new user on the Galaxy server with the information given.
+There are three parameters, all required:
+
+=over 1
+
+=item * user - the username to use. This must follow Galaxy's requirements,
+which currently only allows lowercase alphanumeric, underscore, and dash, or
+the server will return an error.
+
+=item * email - a valid email address for the user
+
+=item * password - the intitial password to set for the user
+
+=back
+
 =head2 api_key
 
     my $key = $ua->api_key;
