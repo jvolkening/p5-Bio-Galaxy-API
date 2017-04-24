@@ -118,6 +118,25 @@ sub users {
 
 }
 
+sub new_user {
+
+    my ($self, %args) = @_;
+
+   
+    my $usr_data = $self->_post(
+        'users',
+        {
+            username => ($args{user}     // die "Missing name"),
+            email    => ($args{email}    // die "Missing email"),
+            password => ($args{password} // die "Missing password"),
+        },
+    ) // return undef;;
+
+    return Bio::Galaxy::API::User->new($self, $usr_data);
+
+}
+
+
 sub api_key {
 
     my ($self, $key) = @_;
