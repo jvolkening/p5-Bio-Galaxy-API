@@ -13,6 +13,7 @@ use URI::Escape;
 
 use Bio::Galaxy::API::Library;
 use Bio::Galaxy::API::User;
+use Bio::Galaxy::API::Group;
 use Bio::Galaxy::API::Workflow;
 
 our $VERSION = '0.002';
@@ -110,6 +111,8 @@ sub users {
 
     my ($self, $user) = @_;
 
+    $user //= '';
+
     my $users = $self->_get('users', ['f_any' => $user])
         // return undef;
     return 
@@ -118,24 +121,52 @@ sub users {
 
 }
 
+sub groups {
+
+    my ($self, $group) = @_;
+
+    my $groups = $self->_get('groups')
+        // return undef;
+    return 
+        map  {Bio::Galaxy::API::Group->new($self, $_)} @{$groups};
+
+}
+
 sub new_user {
 
     my ($self, %args) = @_;
 
    
-    my $usr_data = $self->_post(
+    my $data = $self->_post(
         'users',
         {
             username => ($args{user}     // die "Missing name"),
             email    => ($args{email}    // die "Missing email"),
             password => ($args{password} // die "Missing password"),
         },
-    ) // return undef;;
+    ) // return undef;
 
-    return Bio::Galaxy::API::User->new($self, $usr_data);
+    return Bio::Galaxy::API::User->new($self, $data);
 
 }
 
+sub new_group {
+
+    my ($self, %args) = @_;
+
+    #TODO: implement 'user_ids' and 'role_ids' arguments
+   
+    my $data = $self->_post(
+        'groups',
+        {
+            name => ($args{name} // die "Missing name"),
+        },
+    ) // return undef;
+
+    # $data references array of one item
+    return Bio::Galaxy::API::Group->new($self, $data->[0]);
+
+}
 
 sub api_key {
 
@@ -146,6 +177,39 @@ sub api_key {
         if (defined $key);
 
     return $old_key;
+
+}
+
+sub _put {
+
+    my ($self, $path, $payload) = @_;
+
+    my $url = join '/',
+        $self->{url},
+        $path;
+
+    for (1.. $self->{retry}) {
+
+        my $encoded = JSON->new->encode($payload);
+        my $res = $self->{ua}->put( $url => {
+            headers => {
+                'content-type' => 'application/json',
+                'x-api-key'    => $self->{key} // '',
+            },
+            content => $encoded,
+        } );
+
+        if (! $res->{success}) {
+            warn "HTTP Error: $res->{status} ($res->{reason})\n$res->{content}\n";
+        }
+
+        else {
+            return JSON->new->allow_nonref->decode( $res->{content} );
+        }
+
+    }
+
+    return undef;
 
 }
 
@@ -186,7 +250,7 @@ sub _post {
                 headers => {
                     'content-type'   => "multipart/form-data; boundary=$boundary",
                     'content-length' => $size,
-                    'x-api-key'      => $self->{key},
+                    'x-api-key'      => $self->{key} // '',
                 },
                 content => $cb,
             } );
@@ -198,7 +262,7 @@ sub _post {
             $res = $self->{ua}->post( $url => {
                 headers => {
                     'content-type' => 'application/json',
-                    'x-api-key'    => $self->{key},
+                    'x-api-key'    => $self->{key} // '',
                 },
                 content => $encoded,
             } );
@@ -242,7 +306,7 @@ sub _get {
 
         my $res = $self->{ua}->get($url => {
             headers => {
-                'x-api-key' => $self->{key},
+                'x-api-key' => $self->{key} // '',
             },
         } );
 
