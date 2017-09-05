@@ -25,7 +25,7 @@ die "No matching group found\n" if (! scalar @g);
 die "Too many users found\n"   if (scalar @u > 1);
 die "Too many groups found\n"  if (scalar @g > 1);
 
-my $new_u = $g[0]->add_user($u[0])
+my $new_u = $g[0]->add_user(user => $u[0])
     // die "add failed\n";
 
 say Dumper $new_u;

@@ -4,6 +4,7 @@ lib/Bio/Galaxy/API.pm
 lib/Bio/Galaxy/API/Library.pm
 lib/Bio/Galaxy/API/Library/Item.pm
 lib/Bio/Galaxy/API/User.pm
+lib/Bio/Galaxy/API/Group.pm
 lib/Bio/Galaxy/API/Workflow.pm
 lib/Bio/Galaxy/API/Workflow/Invocation.pm
 MANIFEST			This list of files

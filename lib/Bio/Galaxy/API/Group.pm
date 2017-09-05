@@ -35,7 +35,10 @@ sub name    {return $_[0]->{name}    }
 
 sub add_user {
     
-    my ($self, $usr) = @_;
+    my ($self, %args) = @_;
+
+    my $usr = $args{user}
+        // croak "Must specify user to add";
 
     my $usr_id = $usr;
 
@@ -130,6 +133,30 @@ Returns the group ID.
     my $name = $group->name;
 
 Returns the name associated with the group.
+
+=head2 users
+
+    my @users = $group->users();
+
+Returns an array of C<Bio::Galaxy::API::User> objects representing the users
+associated with the group.
+
+=head2 add_user
+
+    my $added = $group->add_user( $usr );
+
+Attempts to add an existing user to the group. There is one required
+parameter:
+
+=over 1
+
+=item * user - the user to add. This can be either a C<Bio::Galaxy::API::User>
+object or an ID string.
+
+=back
+
+Returns a C<Bio::Galaxy::API::User> object representing the user added, or
+undefined on failure.
 
 =head2 update
 

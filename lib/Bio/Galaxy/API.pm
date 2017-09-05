@@ -476,6 +476,13 @@ Returns an array of L<Bio::Galaxy::API::User> objects representing registered
 Galaxy users. Optionally takes a string containing a username or email
 address, in which case it will filter on that token.
 
+=head2 groups
+
+    my @groups = $ua->groups;
+
+Returns an array of L<Bio::Galaxy::API::Group> objects representing existing
+Galaxy groups.
+
 =head2 libraries
 
     my @libs = $ua->libraries;
@@ -510,6 +517,28 @@ the server will return an error.
 =item * email - a valid email address for the user
 
 =item * password - the intitial password to set for the user
+
+=back
+
+=head2 new_group
+
+    my $group = $ua->new_group(
+        name => $groupname,
+    );
+
+Attempts to create a new group on the Galaxy server with the information given.
+There is one required parameter and two optional parameters:
+
+=over 1
+
+=item * name - (required) the group name to use. An error will be thrown if the group
+already exists.
+
+=item * user_ids - (optional) (UNIMPLEMENTED) An array of user IDs to
+associate with the group
+
+=item * role_ids - (optional) (UNIMPLEMENTED) An array of role IDs to
+associate with the group
 
 =back
 
