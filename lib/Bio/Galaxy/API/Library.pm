@@ -4,47 +4,18 @@ use strict;
 use warnings;
 use 5.012;
 
+use File::Basename qw/basename/;
 use List::Util qw/first/;
 use Data::Dumper;
 use Carp;
 
 use Bio::Galaxy::API::Library::Item;
 
-#'synopsis' => 'This is the personal data library for Baz Bar',
-#'id' => 'ebfb8f50c6abde6d',
-#'create_time_pretty' => '',
-#'can_user_modify' => $VAR1->[0]{'deleted'},
-#'description' => 'Baz Bar\'s library',
-#'model_class' => 'Library',
-#'create_time' => '2017-04-15T01:54:59.147361',
-#'name' => 'baz@bar.net',
-#'deleted' => $VAR1->[1]{'deleted'},
-#'root_folder_id' => 'Febfb8f50c6abde6d',
-#'can_user_add' => $VAR1->[0]{'deleted'},
-#'can_user_manage' => $VAR1->[0]{'deleted'}
+use parent 'Bio::Galaxy::API::Object';
 
-our $VERSION = '0.001';
+sub base { return 'libraries' }
+sub required_params { return qw/id/ }
 
-sub new {
-
-    my ($class, $ua, $props) = @_;
-
-    $props->{ua} = $ua;
-
-    for my $required (qw/ua name id/) {
-        croak "Required parameter $required missing"
-            if (! defined $props->{$required});
-    }
-
-    my $self =  bless $props => $class;
-
-    return $self;
-
-}
-
-sub id      { return $_[0]->{id}             }
-sub name    { return $_[0]->{name}           }
-sub deleted { return $_[0]->{deleted}        }
 sub root    { return $_[0]->{root_folder_id} }
 
 sub contents {
@@ -60,6 +31,86 @@ sub contents {
             $self->{ua},
             $_,
         ) } @{$contents};
+
+}
+
+sub _update_tree {
+
+    my ($self) = @_;
+
+    my $tree = {};
+    my %children = ();
+
+    for my $item ( $self->contents ) {
+
+        my $id = $item->{id};
+        $tree->{$id} = $item;
+        my $parent = $item->{type} eq 'file'
+            ? $item->{folder_id}
+            : $item->{parent_id};
+        $tree->{$id}->{_parent} = $parent;
+        if (defined $parent) {
+            push @{ $children{$parent} }, $id;
+        }
+        $tree->{$id}->{_children} //= [];
+
+    }
+
+    for my $id (keys %children) {
+        $tree->{$id}->{_children} = $children{$id};
+    }
+
+    $self->{tree} = $tree;
+
+}
+
+sub get_item {
+
+    my ($self, %args) = @_;
+
+    my $leaf = $args{parent} // $self->root;
+    my $path = $args{path}   // croak "Must supply 'path' argument";
+
+    $path =~ s/\\/\//g;
+    $path =~ s/^\///g;
+
+    $self->_update_tree;
+
+    croak "parent $leaf not found in library"
+        if (! defined $self->{tree}->{$leaf});
+
+    my @parts = grep {length $_} split /\//, $path;
+    croak "Given path empty" if (! scalar @parts);
+
+    my $item;
+
+    PART:
+    while (@parts) {
+
+        my $item = $parts[0];
+
+        my $existing = first {
+               $self->{tree}->{$_}->{name} eq $item
+          && ! $self->{tree}->{$_}->{deleted}
+        } @{ $self->{tree}->{$leaf}->{_children} };
+
+        return undef if (! defined $existing);
+
+        $leaf = $existing;
+        shift @parts;
+
+    }
+
+    # leaf should now contain ID of requested item
+
+    my $res = $self->{ua}->_get("libraries/$self->{id}/contents/$leaf");
+    return undef if (! defined $res);
+
+    return Bio::Galaxy::API::Library::Item->new(
+        $self->{id},
+        $self->{ua},
+        $res,
+    );
 
 }
 
@@ -90,6 +141,7 @@ sub _add_item {
         my $folder = $parts[0];
     
         my $existing = first {
+          ! $_->{deleted}          &&
             $_->{type} eq 'folder' &&
             $_->{name} eq $folder  &&
             $_->{parent_id} eq $parent
@@ -133,6 +185,7 @@ sub _add_item {
         : $type eq 'file'   ? 'folder_id'
         : croak "Bad type ($type\n";
     my $existing = first {
+      ! $_->{deleted}       &&
         $_->{type} eq $type &&
         $_->{name} eq $name &&
         $_->{$parent_field} eq $parent
@@ -149,6 +202,8 @@ sub _add_item {
         # for files, we should return some indication that no new file was
         # created
         else {
+            say STDERR "file exists!!!!";
+            print Dumper $existing;
             return 0;
         }
     }
@@ -207,6 +262,21 @@ sub add_file {
     );
 
 }
+
+sub delete_item {
+
+    my ($self, $item_id) = @_;
+
+    my $ret = $self->{ua}->_delete(
+        "libraries/$self->{id}/contents/$item_id",
+    );
+
+    croak "Failed to delete item $item_id from library $self->{id}"
+        if (! $ret || ! $ret->{deleted});
+
+    return;
+
+}
     
 1;
 
@@ -243,11 +313,7 @@ methods of the C<Bio::Galaxy::API> class.
 
 =head1 METHODS
 
-=head2 id
-
-    my $id = $lib->id;
-
-Returns the library ID.
+See C<Bio::Galaxy::API::Object> for common methods.
 
 =head2 name
 
@@ -255,6 +321,18 @@ Returns the library ID.
 
 Returns the name associated with the library (note that this value is not
 necessarily unique).
+
+=head2 description
+
+    my $desc = $lib->description;
+
+Returns the description associated with the library.
+
+=head2 synopsis
+
+    my $name = $lib->synopsis;
+
+Returns the synopsis associated with the library.
 
 =head2 deleted
 
@@ -319,6 +397,12 @@ Galaxy will try to guess)
 
 =back
 
+=head2 delete_item
+
+    my $success = $lib->delete_item( $item_id );
+
+Deletes an item from the library, returning true on success and false on
+failure.
 
 =head1 AUTHOR
 
@@ -331,7 +415,7 @@ at L<https://github.com/jvolkening/p5-Bio-Galaxy-API>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2017 Jeremy Volkening.
+Copyright 2017-2018 Jeremy Volkening.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

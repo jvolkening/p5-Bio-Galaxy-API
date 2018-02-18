@@ -1,5 +1,8 @@
 package Bio::Galaxy::API::Library::Item;
 
+use overload
+    '""' => \&id;
+
 use 5.012;
 use strict;
 use warnings FATAL => 'all';

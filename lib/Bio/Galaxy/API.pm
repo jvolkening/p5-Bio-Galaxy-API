@@ -15,6 +15,9 @@ use Bio::Galaxy::API::Library;
 use Bio::Galaxy::API::User;
 use Bio::Galaxy::API::Group;
 use Bio::Galaxy::API::Workflow;
+use Bio::Galaxy::API::Job;
+use Bio::Galaxy::API::Dataset;
+use Bio::Galaxy::API::Util qw/_check_id/;
 
 our $VERSION = '0.002';
 
@@ -168,6 +171,35 @@ sub new_group {
 
 }
 
+sub get_dataset {
+
+    my ($self, $ds_id) = @_;
+
+    _check_id( $ds_id );
+
+    my $res = $self->_get(
+        "datasets/$ds_id"
+    );
+    
+    return Bio::Galaxy::API::Dataset->new($self, $res);
+
+}
+
+sub get_job {
+
+    my ($self, $job_id) = @_;
+
+    _check_id( $job_id );
+
+    my $res = $self->_get(
+        "jobs/$job_id",
+        full => 'True',
+    );
+    
+    return Bio::Galaxy::API::Job->new($self, $res);
+
+}
+
 sub api_key {
 
     my ($self, $key) = @_;
@@ -283,6 +315,46 @@ sub _post {
 
 }
 
+sub _download {
+
+    my ($self, $path, $fn, @params) = @_;
+
+    croak "file already exists, won't overwrite\n"
+        if (-e $fn);
+
+    my $url = join '/',
+        $self->{url},
+        $path;
+
+    if (@params) {
+        $url .= '?' . $self->{ua}->www_form_urlencode(\@params);
+    }
+
+    for (1.. $self->{retry}) {
+
+        open my $out, '>', $fn;
+
+        my $res = $self->{ua}->get($url => {
+            headers => {
+                'x-api-key' => $self->{key} // '',
+            },
+            data_callback => sub { print {$out} $_[0] },
+        } );
+
+        close $out;
+
+        if (! $res->{success}) {
+            warn "HTTP Error: $res->{status} ($res->{reason} $res->{content}) \n";
+            unlink $fn;
+        }
+
+        return 1;
+
+    }
+
+    return undef;
+
+}
 
 sub _get {
 
@@ -293,18 +365,49 @@ sub _get {
         $path;
 
     if (@params) {
-        my @strings;
-        for (@params) {
-            my ($key, $val) = map {uri_escape($_)} @$_;
-            push @strings, "$key=$val";
-        }
-        my $param_string = join '&', @strings;
-        $url .= "?$param_string";
+        $url .= '?' . $self->{ua}->www_form_urlencode(\@params);
     }
 
     for (1.. $self->{retry}) {
 
         my $res = $self->{ua}->get($url => {
+            headers => {
+                'x-api-key' => $self->{key} // '',
+            },
+        } );
+
+        if (! $res->{success}) {
+            warn "HTTP Error: $res->{status} ($res->{reason})\n";
+        }
+        elsif (defined $res->{headers}->{'content-type'}
+                && lc($res->{headers}->{'content-type'}) ne 'application/json') {
+            warn "Error: server did not return JSON payload as expected\n";
+        }
+        else {
+            return JSON->new->allow_nonref->decode( $res->{content} );
+        }
+
+    }
+
+    return undef;
+
+}
+
+sub _delete {
+
+    my ($self, $path, @params) = @_;
+
+    my $url = join '/',
+        $self->{url},
+        $path;
+
+    if (@params) {
+        $url .= '?' . $self->{ua}->www_form_urlencode(\@params);
+    }
+
+    for (1.. $self->{retry}) {
+
+        my $res = $self->{ua}->delete($url => {
             headers => {
                 'x-api-key' => $self->{key} // '',
             },

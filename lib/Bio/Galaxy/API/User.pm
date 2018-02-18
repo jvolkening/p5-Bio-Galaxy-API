@@ -7,42 +7,11 @@ use 5.012;
 use Carp;
 use List::Util qw/first/;
 
-our $VERSION = '0.001';
+use parent 'Bio::Galaxy::API::Object';
 
-#'model_class' => 'StoredWorkflow',
-#'id' => 'f2db41e1fa331b3e',
-#'published' => bless( do{\(my $o = 0)}, 'JSON::XS::Boolean' ),
-#'deleted' => $VAR1->{'published'},
-#'url' => '/api/workflows/f2db41e1fa331b3e',
-#'tags' => [],
-#'name' => 'test workflow',
-#'latest_workflow_uuid' => 'd64c9515-83dc-4505-a842-a32be5c31321',
-#'owner' => 'foo_bar'
+sub base { return 'users' }
+sub required_params { return qw/id email deleted/ }
 
-#use Bio::Galaxy::API::User::Invocation;
-
-sub new {
-
-    my ($class, $ua, $props) = @_;
-
-    $props->{ua} = $ua;
-
-    for my $required (qw/ua email id/) {
-        croak "Required parameter $required missing"
-            if (! defined $props->{$required});
-    }
-
-    my $self =  bless $props => $class;
-
-    $self->update();
-
-    return $self;
-
-}
-
-sub id      {return $_[0]->{id}      }
-sub email   {return $_[0]->{email}   }
-sub deleted {return $_[0]->{deleted} }
 
 sub key {
 
@@ -57,22 +26,6 @@ sub key {
     return defined $key_ref
         ? $key_ref->{value}
         : undef;
-
-}
-
-sub update {
-    
-    my ($self) = @_;
-
-    my $ref = $self->{ua}->_get(
-        "users/$self->{id}",
-    );
-
-    for (keys %{$ref}) {
-        $self->{$_} = $ref->{$_};
-    }
-
-    return;
 
 }
 
@@ -111,11 +64,7 @@ of the C<Bio::Galaxy::API> class.
 
 =head1 METHODS
 
-=head2 id
-
-    my $id = $user->id;
-
-Returns the user ID.
+=See C<Bio::Galaxy::API::Object> for common methods.
 
 =head2 email
 
@@ -139,15 +88,6 @@ Returns the API key of the user. Note that this is not necessarily the same as
 that used for the current session, which may be transacted under a different
 user if that user is an admin.
 
-=head2 update
-
-    $user->update();
-
-Queries the server and performs an in-place update of the user metadata
-stored in the object. This is called once upon object creation and generally
-will not need to be called again, except possibly in the course of long-running
-processes (daemons, etc).
-
 =head1 AUTHOR
 
 Jeremy Volkening, C<< <jdv@base2bio.com> >>
@@ -159,7 +99,7 @@ at L<https://github.com/jvolkening/p5-Bio-Galaxy-API>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2017 Jeremy Volkening.
+Copyright 2017-2018 Jeremy Volkening.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

@@ -5,58 +5,13 @@ use strict;
 use warnings FATAL => 'all';
 use Carp;
 
-our $VERSION = '0.001';
+use parent 'Bio::Galaxy::API::Object';
 
-#'model_class' => 'StoredWorkflow',
-#'id' => 'f2db41e1fa331b3e',
-#'published' => bless( do{\(my $o = 0)}, 'JSON::XS::Boolean' ),
-#'deleted' => $VAR1->{'published'},
-#'url' => '/api/workflows/f2db41e1fa331b3e',
-#'tags' => [],
-#'name' => 'test workflow',
-#'latest_workflow_uuid' => 'd64c9515-83dc-4505-a842-a32be5c31321',
-#'owner' => 'foo_bar'
+sub base { return 'workflows' }
+sub required_params { return qw/id name tags owner deleted/ }
 
 use Bio::Galaxy::API::Workflow::Invocation;
 
-sub new {
-
-    my ($class, $ua, $props) = @_;
-
-    $props->{ua} = $ua;
-
-    for my $required (qw/ua name id/) {
-        croak "Required parameter $required missing"
-            if (! defined $props->{$required});
-    }
-
-    my $self =  bless $props => $class;
-
-    $self->update();
-
-    return $self;
-
-}
-
-sub id      {return $_[0]->{id}     }
-sub name    {return $_[0]->{name}   }
-sub deleted {return $_[0]->{deleted}}
-
-sub update {
-    
-    my ($self) = @_;
-
-    my $ref = $self->{ua}->_get(
-        "workflows/$self->{id}",
-    );
-
-    for (keys %{$ref}) {
-        $self->{$_} = $ref->{$_};
-    }
-
-    return;
-
-}
 
 sub run {
 
@@ -122,11 +77,7 @@ of the C<Bio::Galaxy::API> class.
 
 =head1 METHODS
 
-=head2 id
-
-    my $id = $workflow->id;
-
-Returns the workflow ID.
+=See C<Bio::Galaxy::API::Object> for common methods.
 
 =head2 name
 
@@ -145,6 +96,7 @@ deleted in the Galaxy database.
 =head2 run
 
     my $invocation = $workflow->run(
+        history => 'A test history',
         ds_map => {
             $input_1_id => {
                 id => $dataset_id_1,
@@ -155,7 +107,16 @@ deleted in the Galaxy database.
                 src => $input_src,
             }
         },
-        history => 'A test history',
+        parameters => {
+            3 => {
+                param1 => 9,
+                param2 => 'foo',
+            },
+            5 => {
+                someparam => '0.002',
+            },
+        },
+    );
 
 Runs the workflow on a given set of inputs and returns a
 C<Bio::Galaxy::API::Workflow::Invocation> object representing the current run.
@@ -179,16 +140,13 @@ hash reference with the following keys:
 =item * history - the name of a new history to create contanining the run. If
 not given, a generic history name will be used.
 
+=item * parameters - reference to a hash describing parameters to be set at
+runtime. Each key should be the index of the workflow step and the value
+another hash reference with key/value parameter pairs.
+
 =back
 
 =head2 update
-
-    $workflow->update();
-
-Queries the server and performs and in-place update of the workflow metadata
-stored in the object. This is called once upon object creation and generally
-will not need to be called again except possibly in the course of long-running
-processes (daemons, etc).
 
 =head1 AUTHOR
 
@@ -201,7 +159,7 @@ at L<https://github.com/jvolkening/p5-Bio-Galaxy-API>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2017 Jeremy Volkening.
+Copyright 2017-2018 Jeremy Volkening.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

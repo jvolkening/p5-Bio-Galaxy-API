@@ -1,0 +1,22 @@
+name: "workflow_01"
+id: f2db41e1fa331b3e
+library: "foo@bar.net"
+inputs:
+  0:
+    description: "Required input number 1"
+    filetype: txt
+  1:
+    description: "Required input number 2"
+    filetype: txt
+outputs:
+  2:
+    out_file1:
+      description: "The intermediate output"
+  4:
+    output:
+      description: "The only output"
+configurable:
+  4:
+    time:
+      description: "The time to sleep"
+      type: integer

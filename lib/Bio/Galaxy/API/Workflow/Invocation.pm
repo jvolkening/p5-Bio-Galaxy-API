@@ -42,6 +42,34 @@ sub update {
 
 }
 
+sub states {
+
+    my ($self) = @_;
+
+    $self->update;
+
+    return
+        map  {$_->[1]}
+        sort {$a->[0] <=> $b->[0]}
+        map  {[$_->{order_index}, $_->{state} // 'NA']}
+        @{ $self->{steps} };
+
+}
+
+sub jobs {
+
+    my ($self) = @_;
+
+    $self->update;
+
+    return
+        map  {$_->[1]}
+        sort {$a->[0] <=> $b->[0]}
+        map  {[$_->{order_index}, $_->{job_id} // 'NA']}
+        @{ $self->{steps} };
+
+}
+
 1;
 
 

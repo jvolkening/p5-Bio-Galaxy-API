@@ -5,33 +5,13 @@ use warnings;
 use 5.012;
 
 use Carp;
-use List::Util qw/first/;
 use Scalar::Util qw/blessed/;
 
-our $VERSION = '0.001';
+use parent 'Bio::Galaxy::API::Object';
 
+sub base { return 'groups' }
+sub required_params { return qw/id name/ }
 
-sub new {
-
-    my ($class, $ua, $props) = @_;
-
-    $props->{ua} = $ua;
-
-    for my $required (qw/ua name id/) {
-        croak "Required parameter $required missing"
-            if (! defined $props->{$required});
-    }
-
-    my $self =  bless $props => $class;
-
-    $self->update();
-
-    return $self;
-
-}
-
-sub id      {return $_[0]->{id}      }
-sub name    {return $_[0]->{name}    }
 
 sub add_user {
     
@@ -71,22 +51,6 @@ sub users {
 
 }
 
-sub update {
-    
-    my ($self) = @_;
-
-    my $ref = $self->{ua}->_get(
-        "groups/$self->{id}",
-    );
-
-    for (keys %{$ref}) {
-        $self->{$_} = $ref->{$_};
-    }
-
-    return;
-
-}
-
 1;
 
 
@@ -122,11 +86,7 @@ of the C<Bio::Galaxy::API> class.
 
 =head1 METHODS
 
-=head2 id
-
-    my $id = $group->id;
-
-Returns the group ID.
+=See C<Bio::Galaxy::API::Object> for common methods.
 
 =head2 name
 
