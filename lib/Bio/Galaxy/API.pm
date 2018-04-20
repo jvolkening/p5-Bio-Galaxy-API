@@ -139,7 +139,6 @@ sub new_user {
 
     my ($self, %args) = @_;
 
-   
     my $data = $self->_post(
         'users',
         {
@@ -150,6 +149,23 @@ sub new_user {
     ) // return undef;
 
     return Bio::Galaxy::API::User->new($self, $data);
+
+}
+
+sub new_library {
+
+    my ($self, %args) = @_;
+   
+    my $data = $self->_post(
+        'libraries',
+        {
+            name        => ($args{name}        // die "Missing name"),
+            description => ($args{description} // ''),
+            synopsis    => ($args{synopsis}    // ''),
+        },
+    ) // return undef;
+
+    return Bio::Galaxy::API::Library->new($self, $data);
 
 }
 
@@ -642,6 +658,28 @@ associate with the group
 
 =item * role_ids - (optional) (UNIMPLEMENTED) An array of role IDs to
 associate with the group
+
+=back
+
+=head2 new_library
+
+    my $library = $ua->new_library(
+        name        => $name,
+        description => $description,
+        synopsis    => $synopsis,
+    );
+
+Attempts to create a new library on the Galaxy server with the information given.
+There is one required parameter and two optional parameters:
+
+=over 1
+
+=item * name - (required) the library name to use.
+
+=item * description - (optional) a short description to be displayed to the
+user
+
+=item * synopsis - (optional) a longer synopsis to be displayed to the user
 
 =back
 

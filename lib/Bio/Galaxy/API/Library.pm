@@ -277,6 +277,31 @@ sub delete_item {
     return;
 
 }
+
+sub set_permissions {
+
+    my ($self, %args) = @_;
+
+    my $payload = {action => 'set_permissions'};
+    
+    for (qw/
+        access_ids
+        add_ids
+        manage_ids
+        modify_ids
+    /) {
+        next if (! defined $args{$_});
+        $payload->{"$_\[\]"} = $args{$_};
+    }
+
+    my $data = $self->{ua}->_post(
+        "libraries/$self->{id}/permissions",
+        $payload,
+    ) // return undef;
+
+    return 1;
+
+}
     
 1;
 
@@ -403,6 +428,34 @@ Galaxy will try to guess)
 
 Deletes an item from the library, returning true on success and false on
 failure.
+
+=head2 set_permissions
+
+    my $success = $lib->set_permissions(
+        access_ids => $ids_ref,
+        add_ids    => $ids_ref,
+        manage_ids => $ids_ref,
+        modify_ids => $ids_ref,
+    );
+
+Sets permissions on the library, returning true on success and false on
+failure. There are four parameters, all optional, each defining the roles to
+be associated with that permission type. Each parameter takes an array ref of
+role IDs (user, group, etc). Parameters that are not defined will be
+unchanged. To remove all restrictions on a permission type, pass in an empty
+reference.
+
+=over 1
+
+=item * access_ids - (optional) array reference of role IDs
+
+=item * add_ids - (optional) array reference of role IDs
+
+=item * manage_ids - (optional) array reference of role IDs
+
+=item * modify_ids - (optional) array reference of role IDs
+
+=back
 
 =head1 AUTHOR
 
