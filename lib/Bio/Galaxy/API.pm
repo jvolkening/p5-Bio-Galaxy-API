@@ -116,7 +116,7 @@ sub users {
 
     $user //= '';
 
-    my $users = $self->_get('users', ['f_any' => $user])
+    my $users = $self->_get('users', 'f_any' => $user)
         // return undef;
     return 
         grep {! $_->deleted()}
