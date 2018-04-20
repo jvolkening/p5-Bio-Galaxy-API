@@ -1,18 +1,22 @@
 Build.PL
 Changes
 lib/Bio/Galaxy/API.pm
+lib/Bio/Galaxy/API/Dataset.pm
+lib/Bio/Galaxy/API/Group.pm
+lib/Bio/Galaxy/API/Job.pm
 lib/Bio/Galaxy/API/Library.pm
 lib/Bio/Galaxy/API/Library/Item.pm
+lib/Bio/Galaxy/API/Object.pm
 lib/Bio/Galaxy/API/User.pm
-lib/Bio/Galaxy/API/Group.pm
+lib/Bio/Galaxy/API/Util.pm
 lib/Bio/Galaxy/API/Workflow.pm
 lib/Bio/Galaxy/API/Workflow/Invocation.pm
 MANIFEST			This list of files
+META.json
+META.yml
 README.md
 t/00-load.t
 t/boilerplate.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
-META.yml
-META.json
