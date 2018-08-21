@@ -542,7 +542,7 @@ platform (L<https://galaxyproject.org>).
 
 WARNING: This library is currently in early development. The API (of this
 library, not of the Galaxy REST service) is not stable and will likely change.
-Most functions of the REST API remain unimplemented. This warning will be
+Many endpoints of the REST API remain unimplemented. This warning will be
 removed when the library reaches a more mature state.
 
 =head1 CONSTRUCTORS
