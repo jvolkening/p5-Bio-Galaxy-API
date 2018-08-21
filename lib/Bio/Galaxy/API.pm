@@ -19,7 +19,7 @@ use Bio::Galaxy::API::Job;
 use Bio::Galaxy::API::Dataset;
 use Bio::Galaxy::API::Util qw/_check_id/;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 sub new {
 
