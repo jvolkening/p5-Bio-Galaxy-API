@@ -8,9 +8,8 @@ use Carp;
 
 use parent 'Bio::Galaxy::API::Object';
 
-sub base { return 'datasets' }
-sub required_params { return qw/id history_id state/ }
-
+sub _base { return 'datasets' }
+sub _required_params { return qw/id history_id state/ }
 
 sub download {
 

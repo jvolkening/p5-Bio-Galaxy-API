@@ -8,8 +8,8 @@ use Carp;
 
 use parent 'Bio::Galaxy::API::Object';
 
-sub base { return 'jobs' }
-sub required_params { return qw/id/ }
+sub _base { return 'jobs' }
+sub _required_params { return qw/id/ }
 
 1;
 
@@ -45,9 +45,9 @@ of the C<Bio::Galaxy::API> class.
 
 =head1 METHODS
 
-=See C<Bio::Galaxy::API::Object> for common methods.
+See C<Bio::Galaxy::API::Object> for common methods.
 
-head1 AUTHOR
+=head1 AUTHOR
 
 Jeremy Volkening, C<< <jdv@base2bio.com> >>
 

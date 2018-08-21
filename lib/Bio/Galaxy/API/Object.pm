@@ -16,7 +16,7 @@ sub new {
 
     my $self =  bless $props => $class;
 
-    for my $required ($self->required_params) {
+    for my $required ($self->_required_params) {
         croak "Required parameter $required missing"
             if (! defined $self->{$required});
     }
@@ -47,7 +47,7 @@ sub update {
     
     my ($self) = @_;
 
-    my $base = $self->base;
+    my $base = $self->_base;
 
     my $ref = $self->{ua}->_get(
         "$base/$self->{id}",
@@ -78,8 +78,8 @@ objects
 
     use parent qw/Bio::Galaxy::API::Object/;
 
-    sub base           {return 'somefoo'}
-    sub require_params {return qw/id name/}
+    sub _base           {return 'somefoo'}
+    sub _require_params {return qw/id name/}
 
     # subclass-specific methods
 
@@ -91,16 +91,16 @@ This class is the base class for most/all Galaxy objects, providing methods
 common to most endpoints in the API. To use this, subclasses must at a
 minimum implement two accessors:
 
-=head2 base
+=head2 _base
 
-    sub base {return 'basename'}
+    sub _base {return 'basename'}
 
 Should return the base of the Galaxy API URL for the subclass, i.e. the first
 element in the URL path after 'api/'.
 
-=head2 required_params
+=head2 _required_params
 
-    sub require_params {return qw/id name/}
+    sub _require_params {return qw/id name/}
 
 Should return an array of parameters which are required to be supplied when
 creating a new object of the subclass.

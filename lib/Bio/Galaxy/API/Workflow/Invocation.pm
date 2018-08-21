@@ -42,20 +42,6 @@ sub update {
 
 }
 
-sub states {
-
-    my ($self) = @_;
-
-    $self->update;
-
-    return
-        map  {$_->[1]}
-        sort {$a->[0] <=> $b->[0]}
-        map  {[$_->{order_index}, $_->{state} // 'NA']}
-        @{ $self->{steps} };
-
-}
-
 sub jobs {
 
     my ($self) = @_;
@@ -70,6 +56,20 @@ sub jobs {
 
 }
 
+sub states {
+
+    my ($self) = @_;
+
+    $self->update;
+
+    return
+        map  {$_->[1]}
+        sort {$a->[0] <=> $b->[0]}
+        map  {[$_->{order_index}, $_->{state} // 'NA']}
+        @{ $self->{steps} };
+
+}
+
 1;
 
 
@@ -79,7 +79,6 @@ __END__
 
 Bio::Galaxy::API::Workflow::Invocation - object representing a Galaxy workflow
 run
-
 
 =head1 SYNOPSIS
 
@@ -109,6 +108,18 @@ Returns the invocation ID.
 
 Queries the server and performs and in-place update of the invocation metadata
 stored in the object. This can be used to check the status of the run, etc.
+
+=head2 jobs
+
+    my @job_ids = $invocation->jobs();
+
+Returns a list of job IDs associated with the invocation.
+
+=head2 states
+
+    my @states = $invocation->states();
+
+Returns a list of job state strings associated with the invocation.
 
 =head1 AUTHOR
 

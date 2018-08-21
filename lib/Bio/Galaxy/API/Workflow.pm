@@ -7,8 +7,8 @@ use Carp;
 
 use parent 'Bio::Galaxy::API::Object';
 
-sub base { return 'workflows' }
-sub required_params { return qw/id name tags owner deleted/ }
+sub _base { return 'workflows' }
+sub _required_params { return qw/id name tags owner deleted/ }
 
 use Bio::Galaxy::API::Workflow::Invocation;
 
@@ -77,7 +77,7 @@ of the C<Bio::Galaxy::API> class.
 
 =head1 METHODS
 
-=See C<Bio::Galaxy::API::Object> for common methods.
+See C<Bio::Galaxy::API::Object> for common methods.
 
 =head2 name
 

@@ -2,6 +2,7 @@
 use 5.012;
 use strict;
 use warnings FATAL => 'all';
+use List::Util qw/any/;
 use Test::More;
 
 # Ensure a recent version of Test::Pod::Coverage
@@ -19,4 +20,16 @@ plan skip_all => "Pod::Coverage $min_pc required for testing POD coverage"
 
 my $trustme = { trustme => [qr/^new$/] };
 
-all_pod_coverage_ok($trustme);
+my @skip = qw/Bio::Galaxy::API::Util/;
+
+for my $mod ( all_modules() ) {
+
+    next if (any {$_ eq $mod} @skip);
+    pod_coverage_ok($mod, $trustme);
+
+}
+
+#all_pod_coverage_ok($trustme);
+
+done_testing();
+

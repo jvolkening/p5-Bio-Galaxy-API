@@ -683,6 +683,20 @@ user
 
 =back
 
+=head2 get_dataset
+
+    my $ds = $ua->get_dataset($ds_id);
+
+Takes a single required argument (dataset ID) and returns a
+L<Bio::Galaxy::API::Dataset> object, or undefined if not found
+
+=head2 get_job
+
+    my $job = $ua->get_job($job_id);
+
+Takes a single required argument (job ID) and returns a
+L<Bio::Galaxy::API::Job> object, or undefined if not found
+
 =head2 api_key
 
     my $key = $ua->api_key;

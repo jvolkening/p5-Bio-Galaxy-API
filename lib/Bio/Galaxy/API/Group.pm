@@ -9,8 +9,8 @@ use Scalar::Util qw/blessed/;
 
 use parent 'Bio::Galaxy::API::Object';
 
-sub base { return 'groups' }
-sub required_params { return qw/id name/ }
+sub _base { return 'groups' }
+sub _required_params { return qw/id name/ }
 
 
 sub add_user {
@@ -34,7 +34,10 @@ sub add_user {
         {},
     ) // return undef;
 
-    return Bio::Galaxy::API::User->new($self->{ua}, $data);
+    #return Bio::Galaxy::API::User->new($self->{ua}, $data);
+
+    #returned value varies by Galaxy version but should have {'id'} defined
+    return defined $data->{id};
 
 }
 
@@ -86,7 +89,7 @@ of the C<Bio::Galaxy::API> class.
 
 =head1 METHODS
 
-=See C<Bio::Galaxy::API::Object> for common methods.
+See C<Bio::Galaxy::API::Object> for common methods.
 
 =head2 name
 
@@ -115,8 +118,7 @@ object or an ID string.
 
 =back
 
-Returns a C<Bio::Galaxy::API::User> object representing the user added, or
-undefined on failure.
+Returns true on success or undefined on failure.
 
 =head2 update
 

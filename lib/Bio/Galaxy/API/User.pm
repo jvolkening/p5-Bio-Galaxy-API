@@ -9,8 +9,8 @@ use List::Util qw/first/;
 
 use parent 'Bio::Galaxy::API::Object';
 
-sub base { return 'users' }
-sub required_params { return qw/id email deleted/ }
+sub _base { return 'users' }
+sub _required_params { return qw/id email/ }
 
 
 sub key {
@@ -64,7 +64,7 @@ of the C<Bio::Galaxy::API> class.
 
 =head1 METHODS
 
-=See C<Bio::Galaxy::API::Object> for common methods.
+See C<Bio::Galaxy::API::Object> for common methods.
 
 =head2 email
 

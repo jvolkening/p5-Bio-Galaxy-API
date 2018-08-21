@@ -13,8 +13,8 @@ use Bio::Galaxy::API::Library::Item;
 
 use parent 'Bio::Galaxy::API::Object';
 
-sub base { return 'libraries' }
-sub required_params { return qw/id/ }
+sub _base { return 'libraries' }
+sub _required_params { return qw/id/ }
 
 sub root    { return $_[0]->{root_folder_id} }
 
@@ -454,6 +454,24 @@ reference.
 =item * manage_ids - (optional) array reference of role IDs
 
 =item * modify_ids - (optional) array reference of role IDs
+
+=back
+
+=head2 get_item
+
+    my $item = $lib->get_item(
+        parent    => $parent_id,
+        path      => $name,
+    );
+
+Returns an existing library item. Takes two possible parameters:
+
+=over 1
+
+=item * path - (required) path to item relative to parent
+
+=item * parent - the ID of the parent folder under which to search for the
+item (if not given, defaults to the root of the library)
 
 =back
 
