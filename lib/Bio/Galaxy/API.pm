@@ -110,6 +110,18 @@ sub workflows {
 
 }
 
+sub jobs {
+
+    my ($self) = @_;
+
+    my $jobs = $self->_get('jobs')
+        // return undef;
+    return 
+        grep {! $_->deleted()}
+        map  {Bio::Galaxy::API::Job->new($self, $_)} @{$jobs};
+
+}
+
 sub users {
 
     my ($self, $user) = @_;
@@ -615,6 +627,13 @@ libraries available to the current user.
 
 Returns an array of L<Bio::Galaxy::API::Workflow> objects representing
 workflows available to the current user.
+
+=head2 jobs
+
+    my @jobs = $ua->jobs;
+
+Returns an array of L<Bio::Galaxy::API::Job> objects representing
+jobs of the current user.
 
 =head2 new_user
 
