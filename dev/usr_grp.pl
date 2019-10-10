@@ -15,6 +15,8 @@ my $ua = Bio::Galaxy::API->new(
 );
 
 my @usrs = $ua->users;
+print Dumper $_ for (@usrs);
+exit;
 my @grps = $ua->groups;
 
 my @u = grep { $_->email eq $usr } @usrs;

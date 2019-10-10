@@ -4,6 +4,10 @@ use strict;
 use warnings;
 use 5.012;
 
+use overload
+    '""' => sub{ $_[0]->{id} };
+
+
 use vars '$AUTOLOAD';
 
 use Carp;

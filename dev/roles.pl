@@ -13,11 +13,9 @@ my $ua = Bio::Galaxy::API->new(
     check_secure => 0,
 );
 
-say "adding user...";
-my $usr = $ua->new_user(
-    user     => 'john-doe',
-    email    => 'jdoe@base2bio.com',
-    password => 'jdjdjd9',
-);
+say "fetching roles...";
+my @roles = $ua->roles();
 
-print Dumper $usr;
+for (@roles) {
+    print Dumper $_;
+}

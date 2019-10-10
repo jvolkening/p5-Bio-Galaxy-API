@@ -14,12 +14,13 @@ use URI::Escape;
 use Bio::Galaxy::API::Library;
 use Bio::Galaxy::API::User;
 use Bio::Galaxy::API::Group;
+use Bio::Galaxy::API::Role;
 use Bio::Galaxy::API::Workflow;
 use Bio::Galaxy::API::Job;
 use Bio::Galaxy::API::Dataset;
 use Bio::Galaxy::API::Util qw/_check_id/;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 sub new {
 
@@ -144,6 +145,17 @@ sub groups {
         // return undef;
     return 
         map  {Bio::Galaxy::API::Group->new($self, $_)} @{$groups};
+
+}
+
+sub roles {
+
+    my ($self, $role) = @_;
+
+    my $roles = $self->_get('roles')
+        // return undef;
+    return 
+        map  {Bio::Galaxy::API::Role->new($self, $_)} @{$roles};
 
 }
 
@@ -613,6 +625,13 @@ address, in which case it will filter on that token.
 
 Returns an array of L<Bio::Galaxy::API::Group> objects representing existing
 Galaxy groups.
+
+=head2 roles
+
+    my @roles = $ua->roles;
+
+Returns an array of L<Bio::Galaxy::API::Role> objects representing existing
+Galaxy roles.
 
 =head2 libraries
 

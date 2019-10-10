@@ -12,6 +12,27 @@ use parent 'Bio::Galaxy::API::Object';
 sub _base { return 'users' }
 sub _required_params { return qw/id email/ }
 
+sub private_role {
+
+    my ($self) = @_;
+
+    my @roles = $self->{ua}->roles;
+
+    my @r = grep {
+           $_->name eq $self->email
+        && $_->type eq 'private'
+    } @roles;
+
+    if (scalar @r != 1) {
+        # This is expected to always be defined, and thus should throw a fatal
+        # error if missing
+        die "ERROR: Failed to located unique private role for user $self";
+    }
+
+    return $r[0];
+
+}
+
 
 sub key {
 
@@ -87,6 +108,16 @@ removed completely from the database).
 Returns the API key of the user. Note that this is not necessarily the same as
 that used for the current session, which may be transacted under a different
 user if that user is an admin.
+
+=head2 private_role
+
+    my $role = $user->private_role;
+
+Returns the private role of the user as a L<Bio::Galaxy::API::Role> object.
+This role is needed for some operations such as setting library permissions.
+Note that it is currently matched based on email address of the user -- this
+is not a documented behavior but appears to be how the user/role link is
+maintained.
 
 =head1 AUTHOR
 

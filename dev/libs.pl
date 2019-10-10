@@ -13,11 +13,10 @@ my $ua = Bio::Galaxy::API->new(
     check_secure => 0,
 );
 
-say "adding user...";
-my $usr = $ua->new_user(
-    user     => 'john-doe',
-    email    => 'jdoe@base2bio.com',
-    password => 'jdjdjd9',
-);
+say "fetching libs...";
+my @libs = $ua->libraries();
 
-print Dumper $usr;
+for (@libs) {
+    print Dumper $_;
+    print Dumper $_->get_permissions;
+}

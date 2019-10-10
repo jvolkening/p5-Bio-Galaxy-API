@@ -302,6 +302,18 @@ sub set_permissions {
     return 1;
 
 }
+
+sub get_permissions {
+
+    my ($self, %args) = @_;
+
+    my $data = $self->{ua}->_get(
+        "libraries/$self->{id}/permissions"
+    ) // return undef;
+
+    return $data;
+
+}
     
 1;
 
@@ -444,6 +456,13 @@ be associated with that permission type. Each parameter takes an array ref of
 role IDs (user, group, etc). Parameters that are not defined will be
 unchanged. To remove all restrictions on a permission type, pass in an empty
 reference.
+
+=head2 get_permissions
+
+    my $perms = $lib->get_permissions;
+
+Gets permissions on the library. Currently returns as a hash reference, but
+eventually will return as a separate object. 
 
 =over 1
 
