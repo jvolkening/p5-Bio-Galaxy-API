@@ -7,6 +7,7 @@ lib/Bio/Galaxy/API/Job.pm
 lib/Bio/Galaxy/API/Library.pm
 lib/Bio/Galaxy/API/Library/Item.pm
 lib/Bio/Galaxy/API/Object.pm
+lib/Bio/Galaxy/API/Role.pm
 lib/Bio/Galaxy/API/User.pm
 lib/Bio/Galaxy/API/Util.pm
 lib/Bio/Galaxy/API/Workflow.pm
