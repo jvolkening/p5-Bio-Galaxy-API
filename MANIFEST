@@ -13,6 +13,7 @@ lib/Bio/Galaxy/API/Util.pm
 lib/Bio/Galaxy/API/Workflow.pm
 lib/Bio/Galaxy/API/Workflow/Invocation.pm
 MANIFEST			This list of files
+MANIFEST.SKIP
 META.json
 META.yml
 README.md

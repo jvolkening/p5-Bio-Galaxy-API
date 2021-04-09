@@ -1,5 +1,7 @@
 Revision history for Bio-Galaxy-API
 
+0.004001   2021-04-09
+        Fix check of JSON return content-type
 0.004   2019-10-10
         Added Role class
 0.003   2018-08-20
