@@ -420,8 +420,8 @@ sub _get {
             warn "HTTP Error: $res->{status} ($res->{reason})\n";
         }
         elsif (defined $res->{headers}->{'content-type'}
-                && lc($res->{headers}->{'content-type'}) ne 'application/json') {
-            warn "Error: server did not return JSON payload as expected\n";
+                && lc($res->{headers}->{'content-type'}) !~ /^application\/json\b/) {
+            warn "Error: server did not return JSON payload as expected ($res->{headers}->{'content-type'})\n";
         }
         else {
             return JSON->new->allow_nonref->decode( $res->{content} );
@@ -457,7 +457,7 @@ sub _delete {
             warn "HTTP Error: $res->{status} ($res->{reason})\n";
         }
         elsif (defined $res->{headers}->{'content-type'}
-                && lc($res->{headers}->{'content-type'}) ne 'application/json') {
+                && lc($res->{headers}->{'content-type'}) !~ /^application\/json\b/) {
             warn "Error: server did not return JSON payload as expected\n";
         }
         else {
